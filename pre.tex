@@ -10,32 +10,54 @@
 
 \maketitle
 
+\section{Overview}
+
 \begin{frame}{Executive Summary}
     \small
     \begin{itemize}
         \item This project builds an integrated 2D Boeing 747 circular-tracking workflow for control, simulation, and estimation.
         \item The framework combines LQR inner-loop regulation, RK4 nonlinear state propagation, and Gaussian Bayes/MAP state estimation.
         \item Under the baseline setting, the aircraft converges smoothly to the reference circle with near-zero steady-state cross-track error and tight speed regulation.
-        \item The main message is that the proposed pipeline is accurate, computationally light, and robust enough for coursework-scale flight simulation.
+        \item The main message is that the proposed pipeline is accurate, computationally light, and presentation-ready for coursework-scale flight simulation.
     \end{itemize}
 \end{frame}
 
-\section{Problem}
+\begin{frame}{Project Scope and Baseline Setup}
+    \begin{columns}[T]
+        \begin{column}{0.43\textwidth}
+            \small
+            \[
+                \mathbf{x} = [x,\, y,\, \psi,\, \phi,\, v]^\top,
+                \qquad
+                \mathbf{u} = [\phi_{\mathrm{cmd}},\, T]^\top
+            \]
 
-\begin{frame}{Problem Formulation}
-    \small
-    \[
-        \mathbf{x} = [x,\, y,\, \psi,\, \phi,\, v]^\top,
-        \qquad
-        \mathbf{u} = [\phi_{\mathrm{cmd}},\, T]^\top
-    \]
-
-    \begin{itemize}
-        \item Objective: drive a Boeing 747 model to track a counterclockwise circular reference while maintaining the target speed.
-        \item Reference geometry: circle centered at $(0,0)$ with $R = 120{,}000\,\mathrm{m}$ and $v_{\mathrm{ref}} = 210\,\mathrm{m/s}$.
-        \item Performance goals: reduce cross-track error, keep heading and bank response smooth, respect bank/thrust limits, and regulate speed.
-        \item Assumptions: planar flight, quasi-steady drag, discrete control update, and Gaussian measurement noise.
-    \end{itemize}
+            \begin{itemize}
+                \item Objective: converge from an off-circle initial condition to a counterclockwise reference orbit.
+                \item Controller stack: geometry guidance, LQR heading-bank regulation, and thrust hold.
+                \item Evaluation: tracking accuracy, actuator usage, runtime, and estimation consistency.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.57\textwidth}
+            \scriptsize
+            \renewcommand{\arraystretch}{1.08}
+            \begin{tabular}{|p{0.30\linewidth}|p{0.60\linewidth}|}
+                \hline
+                \textbf{Item} & \textbf{Baseline} \\
+                \hline
+                Reference & $R=120\,\mathrm{km}$, $v_{\mathrm{ref}}=210\,\mathrm{m/s}$ \\
+                \hline
+                Initial state & $[R+2000,\,0,\,96^\circ,\,0^\circ,\,210]$ \\
+                \hline
+                Simulation & $\Delta t=0.05\,\mathrm{s}$, $t_{end}=800\,\mathrm{s}$ \\
+                \hline
+                Constraints & $|\phi|\le 35^\circ$, clipped thrust and speed envelope \\
+                \hline
+                Noise model & Gaussian measurements for Bayes/MAP diagnostics \\
+                \hline
+            \end{tabular}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 \begin{frame}{Why This Workflow Matters}
@@ -50,7 +72,7 @@
 
 \begin{frame}{Simulation Interface Overview}
     \centering
-    \includegraphics[width=\textwidth,height=0.98\textheight,keepaspectratio]{latex/assets/overview.png}
+    \includegraphics[width=\textwidth,height=0.99\textheight,keepaspectratio]{latex/assets/overview.png}
 \end{frame}
 
 \section{Methodology}
@@ -60,24 +82,38 @@
     \includegraphics[width=0.95\textwidth]{latex/assets/system_architecture.png}
 \end{frame}
 
-\begin{frame}{Modeling and Algorithms}
-    \scriptsize
-    \begin{block}{Nonlinear Planar Dynamics}
-        The five-state model propagates position, heading, bank angle, and speed. The heading rate follows $\dot{\psi} = \frac{g \tan \phi}{v}$, while bank angle follows a first-order lag and speed is driven by thrust minus aerodynamic drag.
-    \end{block}
+\begin{frame}{Guidance and Control Logic}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \centering
+            \includegraphics[width=\linewidth,height=0.99\textheight,keepaspectratio]{latex/assets/controller_logic.png}
+        \end{column}
+        \begin{column}{0.52\textwidth}
+            \small
+            \begin{itemize}
+                \item The geometry block computes current radius, tangent heading, and signed cross-track error.
+                \item Desired heading is corrected by a bounded nonlinear term based on $e_{ct}$.
+                \item Feedforward bank comes from circular-motion curvature, while LQR regulates $e_\psi$ and $e_\phi$.
+                \item A separate thrust channel keeps the aircraft close to the reference speed.
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
 
-    \begin{block}{Control, Integration, and Estimation}
-        \setlength{\itemsep}{0.2em}
-        \begin{itemize}
-            \item LQR stabilizes heading and bank-angle errors around the circular-tracking reference.
-            \item RK4 propagates the nonlinear dynamics at $\Delta t = 0.05\,\mathrm{s}$ over an $800\,\mathrm{s}$ horizon.
-            \item A Gaussian Bayes/MAP estimator processes noisy measurements and reports estimation consistency.
-        \end{itemize}
-    \end{block}
-
-    \begin{alertblock}{Baseline Setup}
-        The aircraft starts $2\,\mathrm{km}$ outside the target circle, and the evaluation tracks error, speed, actuator usage, runtime, and estimation consistency.
-    \end{alertblock}
+\begin{frame}[fragile]{Simulation Loop Sketch}
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily\tiny,breaklines=true,columns=fullflexible,showstringspaces=false]
+for k in range(N):
+    r_now, psi_tangent, e_ct = geometry(state, R)
+    psi_des = psi_tangent + clip(arctan(k_ct * (-e_ct)), deg=25)
+    phi_ff = atan(v_ref**2 / (g * R))
+    e = [wrap(psi - psi_des), phi - phi_ff]
+    delta_phi = -K @ e
+    phi_cmd = clip(phi_ff + delta_phi, -phi_max, phi_max)
+    thrust = D_guess + k_v * (v_ref - v)
+    state = rk4_step(f, state, [phi_cmd, thrust], dt)
+    z = state + measurement_noise()
+    x_hat, P = gaussian_map_update(x_hat, P, z)
+\end{lstlisting}
 \end{frame}
 
 \section{Results}
@@ -135,6 +171,52 @@
     \end{columns}
 \end{frame}
 
+\begin{frame}{Detailed Control Responses}
+    \centering
+    \includegraphics[width=\textwidth,height=0.99\textheight,keepaspectratio]{latex/assets/part1_control.png}
+\end{frame}
+
+\begin{frame}{Dynamics and State Responses}
+    \centering
+    \includegraphics[width=\textwidth,height=0.99\textheight,keepaspectratio]{latex/assets/part2_dynamics.png}
+\end{frame}
+
+\begin{frame}{Sensitivity to Time Step}
+    \begin{columns}[T]
+        \begin{column}{0.60\textwidth}
+            \includegraphics[width=\linewidth,height=0.99\textheight,keepaspectratio]{latex/assets/dt_sensitivity.png}
+        \end{column}
+        \begin{column}{0.40\textwidth}
+            \scriptsize
+            \renewcommand{\arraystretch}{1.04}
+            \begin{tabular}{|c|c|c|}
+                \hline
+                $\Delta t$ & RMSE($e_{ct}$) & Head RMSE \\
+                \hline
+                0.02 & 439.63 & 3.77 \\
+                \hline
+                0.05 & 439.64 & 3.76 \\
+                \hline
+                0.10 & 440.06 & 3.78 \\
+                \hline
+                0.20 & 440.91 & 3.80 \\
+                \hline
+            \end{tabular}
+
+            \vspace{0.6em}
+            \begin{itemize}
+                \item Performance varies only mildly across the tested time steps.
+                \item The baseline $\Delta t=0.05\,\mathrm{s}$ is already conservative enough for this workflow.
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Reference-Radius Sensitivity}
+    \centering
+    \includegraphics[width=\textwidth,height=0.99\textheight,keepaspectratio]{latex/assets/trajectory_family.png}
+\end{frame}
+
 \begin{frame}{Sensitivity and Controller Trade-Off}
     \begin{columns}[T]
         \begin{column}{0.58\textwidth}
@@ -185,14 +267,48 @@
     \end{columns}
 \end{frame}
 
-\section{Conclusions}
+\begin{frame}{Posterior Versus True State}
+    \centering
+    \includegraphics[width=\textwidth,height=0.99\textheight,keepaspectratio]{latex/assets/state_estimate_comparison.png}
+\end{frame}
 
-\begin{frame}{Discussion and Future Work}
+\begin{frame}{Computation Timing}
+    \begin{columns}[T]
+        \begin{column}{0.56\textwidth}
+            \includegraphics[width=\linewidth,height=0.99\textheight,keepaspectratio]{latex/assets/timing_distribution.png}
+        \end{column}
+        \begin{column}{0.44\textwidth}
+            \scriptsize
+            \renewcommand{\arraystretch}{1.06}
+            \begin{tabular}{|p{0.55\linewidth}|p{0.25\linewidth}|}
+                \hline
+                \textbf{Metric} & \textbf{Value} \\
+                \hline
+                Mean controller time & $0.0165\,\mathrm{ms}$ \\
+                \hline
+                95\% controller time & $0.0176\,\mathrm{ms}$ \\
+                \hline
+                Mean estimator time & $0.0344\,\mathrm{ms}$ \\
+                \hline
+                95\% estimator time & $0.0365\,\mathrm{ms}$ \\
+                \hline
+            \end{tabular}
+
+            \vspace{0.6em}
+            \begin{itemize}
+                \item Both modules run comfortably below the $50\,\mathrm{ms}$ control interval.
+                \item The timing distribution stays compact without problematic long tails.
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Key Findings and Future Work}
     \small
     \begin{itemize}
-        \item Strengths: stable circular tracking, low computational cost, clear controller-estimator architecture, and interpretable uncertainty diagnostics.
-        \item Main limitations: planar flight assumption, simplified actuator and disturbance modeling, first-order discretization in LQR design, and true-state feedback instead of estimated-state feedback.
-        \item Future work: close the loop around estimated states, add wind/disturbances, compare with MPC or nonlinear guidance laws, and extend toward higher-fidelity aircraft dynamics.
+        \item Stable circular tracking, low computational cost, and interpretable uncertainty diagnostics are the main strengths of the current pipeline.
+        \item The largest modeling limits are planar flight, simplified actuator and disturbance models, first-order LQR discretization, and true-state feedback instead of estimated-state feedback.
+        \item Natural next steps are estimated-state closed-loop control, wind and disturbance injection, and comparison with MPC or nonlinear guidance laws.
     \end{itemize}
 \end{frame}
 
