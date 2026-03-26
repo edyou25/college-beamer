@@ -1,0 +1,44 @@
+{
+  "latex-workshop.latex.outDir": "%DIR%/build",
+  "latex-workshop.latex.tools": [
+    {
+      "name": "pdflatex-build",
+      "command": "pdflatex",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-output-directory=%OUTDIR%",
+        "%DOCFILE_EXT%"
+      ]
+    },
+    {
+      "name": "xelatex-build",
+      "command": "xelatex",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-output-directory=%OUTDIR%",
+        "%DOCFILE_EXT%"
+      ]
+    }
+  ],
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "pdflatex -> pdflatex",
+      "tools": [
+        "pdflatex-build",
+        "pdflatex-build"
+      ]
+    },
+    {
+      "name": "xelatex -> xelatex",
+      "tools": [
+        "xelatex-build",
+        "xelatex-build"
+      ]
+    }
+  ],
+  "latex-workshop.latex.recipe.default": "first"
+}
