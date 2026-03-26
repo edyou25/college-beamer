@@ -1,0 +1,33 @@
+1. Introduction
+2. Problem Statement
+2.1 Objective
+2.2 State, Input, and Reference
+2.3 Performance Requirements
+2.4 Constraints and Assumptions
+3. Methodology
+3.1 Parameter Provenance
+3.2 Nonlinear B747 Planar Dynamics
+3.3 RK4 Discretization
+3.4 Circular Tracking Controller
+3.5 Gaussian Bayes/MAP Estimator
+3.6 Simulation Workflow
+3.7 Software Architecture and Data Flow
+4. Results and Analysis
+4.1 Experiment Setup
+4.2 Tracking and Regulation Performance
+4.3 Computational Efficiency
+4.4 Estimation Diagnostics
+4.5 Visual Evidence
+4.6 Cross-Check with Supplementary RK4/Euler Study
+5. Extended Experimental Studies
+5.1 Transient Behavior in the First 120 Seconds
+5.2 State-Estimation Consistency and Error Geometry
+5.3 Sensitivity to Integration Time Step
+5.4 Sensitivity to Reference-Circle Radius
+5.5 Sensitivity to Measurement Noise
+5.6 Sensitivity to LQR Weight Selection
+5.7 Recreated RK4-versus-Euler Benchmark
+5.8 Summary of Extended Experimental Evidence
+6. Discussion
+7. Conclusion
+8. One-Page Summary of Group Contributions
