@@ -1,227 +1,230 @@
 \documentclass{beamer}
-% === collegeBeamer.sty options 可用选项 ===
-%
-% --- University/Institute Options 大学/机构 ---
-% [polyu]  % 香港理工大学（PolyU）
-% [swu]    % 西南大学（SWU）
-% [szu]    % 深圳大学（SZU）
-% [hit]    % 哈尔滨工业大学（HIT）
-% [zafu]   % 浙江农林大学（ZAFU）
-% [nwpu]   % 西北工业大学（NWPU）
-% [CQU]    % 重庆大学（CQU）
-% [heu]    % 哈尔滨工程大学（HEU）
-% [dgut]   % 东莞理工学院（DGUT）
-% [zjut]   % 浙江工业大学（ZJUT）
-% [ouc]    % 中国海洋大学（OUC）
-% [saes]   % 上海航天设备研究所（SAES）
-% [ouc]    % 中国海洋大学（OUC）
-% [bjtu]   % 北京交通大学（BJTU）
-% [xmu]    % 厦门大学（XMU）
-% [zzu]    % 郑州大学(ZZU)
-% [tnu]    % 天津师范大学（TNU）
-% [thu]    % 清华大学 (THU)
-% [cityu]  % 香港城市大学（CityUHK）
-% [shanghaitech] % 上海科技大学(ShanghaiTech)
-% 
-% --- Language Options 语言 ---
-% [en]     % English, pls compile with pdflLaTeX 英语，请使用 pdflLaTeX 编译
-% [zh]     % Chinese, automatically loads xeCJK and Chinese fonts, pls compile with XeLaTeX 中文，自动加载 xeCJK 包和中文字体，请使用 XeLaTeX 编译
-%
-% --- Example Usage ---
-\usepackage[cityu,en]{collegeBeamer}
+\usepackage[polyu,en]{collegeBeamer}
 
-% meta-eata
-\title{City University of Hong Kong}
-\subtitle{Using \LaTeX\ to prepare slides}
-\author{LI Yanru}
-\date{Updated 4 Mar 2026}
+\title{Boeing 747 Trajectory Tracking}
+\subtitle{Optimization, ODE Solving, and State Estimation}
+\author{Yufa You (25144639R) \texorpdfstring{\\}{, } Ruige Yang (25145125R)}
+\date{AAE6202 Course Project}
 
-% document body
-\begin{document}
-    
-    \maketitle
-    
-    \begin{frame}
-        This template is a secondary creation of \bhref{https://www.overleaf.com/latex/templates/sintef-presentation/jhbhdffczpnx}{SINTEF Presentation} template from \bhref{mailto:federico.zenith@sintef.no}{Federico Zenith} \vspace{\baselineskip}
-        
-        Following is a brief introduction written by \bhref{mailto:federico.zenith@sintef.no}{Federico Zenith} about how to use \LaTeX\ and beamer to prepare slides. All rights reserved by him\vspace{\baselineskip}
-        
-        This template is released under \bhref{https://creativecommons.org/licenses/by-nc/4.0/legalcode}{Creative Commons CC BY 4.0} license
-    \end{frame}
-    
-    \section{Introduction}
-    
-    \begin{frame}{Beamer for SINTEF slides}
-        \begin{itemize}
-            \item We assume you can use \LaTeX; if you cannot, \bhref{http://en.wikibooks.org/wiki/LaTeX/}{you can learn it here}
-            \item Beamer is one of the most popular and powerful document classes for presentations in \LaTeX
-            \item Beamer has also a detailed \bhref{http://www.ctan.org/tex-archive/macros/latex/contrib/beamer/doc/beameruserguide.pdf}{user manual}
-            \item Here we will present only the most basic features to get you up to speed
-        \end{itemize}
-    \end{frame}
-    
-    \begin{frame}{Beamer vs. PowerPoint}
-        Compared to PowerPoint, using \LaTeX\ is better because:
-        \begin{itemize}
-            \item It is not What-You-See-Is-What-You-Get, but
-            What-You-\emph{Mean}-Is-What-You-Get:\\
-            you write the content, the computer does the typesetting
-            \item Produces a \texttt{pdf}: no problems with fonts, formulas, program versions
-            \item Easier to keep consistent style, fonts, highlighting, etc.
-            \item Math typesetting in \TeX\ is the best:
-            \begin{equation*}
-                \mathrm{i}\,\hslash\frac{\partial}{\partial t} \Psi(\mathbf{r},t) =
-                -\frac{\hslash^2}{2\,m}\nabla^2\Psi(\mathbf{r},t)
-                + V(\mathbf{r})\Psi(\mathbf{r},t)
-            \end{equation*}
-        \end{itemize}
-    \end{frame}
-    
-    \section{Editing}
-    
-    \begin{frame}[fragile]{Selecting the Class}
-        After the last update to the graphic profile, the \texttt{sintef} theme for
-        Beamer has been updated into a full-fledged class.
-        To start working with \texttt{sintefbeamer}, start a \LaTeX\ document with the preamble:
-        \begin{block}{Minimum Beamer Document}
-            \begin{lstlisting}[language=TeX]
-\documentclass{beamer}
 \begin{document}
 
-\begin{frame}{Hello, world!}
-    % contents
-\end {frame}
+\maketitle
 
-\end{document}\end{lstlisting}
-            \end{block}
-        \end{frame}
-        
-        \begin{frame}[fragile]{Title page}
-            To set a typical title page, you call some commands in the preamble:
-            \begin{block}{The Commands for the Title Page}
-                \begin{lstlisting}[language=TeX]
-\title{Sample Title}
-\subtitle{Sample subtitle}
-\author{First Author, Second Author}
-\date{Defaults to today's}\end{lstlisting}
-            \end{block}
-            You can then write out the title page with \verb|\maketitle|.
-            
-            You can set a different background image than the default one with the \verb|\titlebackground| command, set before \verb|\maketitle|.
-            
-            In the \texttt{backgrounds} folder, you can find a lot of standard backgrounds for SINTEF presentation title pages.
-        \end{frame}
-        
-        \begin{frame}[fragile]{Writing a Simple Slide}
-            \framesubtitle{It's really easy!}
-            \begin{itemize}[<+->]
-                \item A typical slide has bulleted lists
-                \item These can be uncovered in sequence
-            \end{itemize}
-            \begin{block}{Code for a Page with an Itemised List}<+->
-                \begin{lstlisting}[language=TeX]
-\begin{frame}
-    \frametitle{Writing a Simple Slide}
-    \framesubtitle{It's really easy!}
-    \begin{itemize}[<+->]
-        \item A typical slide has bulleted lists
-        \item These can be uncovered in sequence
+\begin{frame}{Executive Summary}
+    \small
+    \begin{itemize}
+        \item This project builds an integrated 2D Boeing 747 circular-tracking workflow for control, simulation, and estimation.
+        \item The framework combines LQR inner-loop regulation, RK4 nonlinear state propagation, and Gaussian Bayes/MAP state estimation.
+        \item Under the baseline setting, the aircraft converges smoothly to the reference circle with near-zero steady-state cross-track error and tight speed regulation.
+        \item The main message is that the proposed pipeline is accurate, computationally light, and robust enough for coursework-scale flight simulation.
     \end{itemize}
-\end{frame}\end{lstlisting}
-            \end{block}
-        \end{frame}
-        
-        \begin{frame}[fragile]{Adding images}
-            Adding images works like in normal \LaTeX:
-            \begin{columns}
-                \begin{column}{0.7\textwidth}
-                    \begin{block}{Code for Adding Images}
-                        \begin{lstlisting}[language=TeX]
-\usepackage{graphicx}
-% ...
-\includegraphics
-[width=\textwidth]{gallery/img.jpg}\end{lstlisting}
-                    \end{block}
-                \end{column}
-                \begin{column}{0.3\textwidth}
-                    \vskip5pt\includegraphics[width=\textwidth]{gallery/img.jpg}
-                \end{column}
-            \end{columns}
-        \end{frame}
-        
-        \begin{frame}[fragile]{Splitting in Columns}
-            Splitting the page is easy and common; typically, one side has a picture and the other text:
-            \begin{columns}
-                \begin{column}{0.6\textwidth}
-                    This is the first column
-                \end{column}
-                \begin{column}{0.3\textwidth}
-                    And this the second
-                \end{column}
-            \end{columns}
-            \begin{block}{Column Code}
-                \begin{lstlisting}[language=TeX]
-\begin{columns}
-    \begin{column}{0.6\textwidth}
-        This is the first column
-    \end{column}
-    \begin{column}{0.3\textwidth}
-        And this the second
-    \end{column}
-    % There could be more!
-\end{columns}\end{lstlisting}
-            \end{block}
-        \end{frame}
-        
-        \begin{frame}[fragile]
-            \frametitle{Fonts}
-            \begin{itemize}
-                \item The paramount task of fonts is being readable
-                \item There are good ones...
-                \begin{itemize}
-                    \item {\textrm{Use serif fonts only with high-definition projectors}}
-                    \item {\textsf{Use sans-serif fonts otherwise (or if you simply prefer them)}}
-                \end{itemize}
-                \item ... and not so good ones:
-                \begin{itemize}
-                    \item {\texttt{Never use monospace for normal text}}
-                    \item {\frakfamily Gothic, calligraphic or weird fonts: should always: be
-                        avoided}
-                \end{itemize}
-            \end{itemize}
-        \end{frame}
-        
-        \begin{frame}[fragile]{Look}
-            \begin{itemize}
-                \item To change the colour of the title dash, give one of the class options \texttt{cyandash} (default), \texttt{greendash}, \texttt{magentadash}, \texttt{yellowdash}, or \texttt{nodash}.
-                \item To change between the light and dark themes, give the class options \texttt{light} (default) or \texttt{dark}. It is not possible to switch theme for one slide because of the design of Beamer---and it's probably a good thing.
-                \item To insert a final slide, use \verb|\backmatter|.
-                \item The aspect ratio defaults to 16:9, but you can change it to 4:3 for old projectors by passing the class option \texttt{aspectratio=43}; any other values accepted by Beamer are also possible.
-            \end{itemize}
-        \end{frame}
-        
-        \section{Summary}
-        
-        \begin{frame}
-            \frametitle{Good Luck!}
-            \begin{itemize}
-                \item Enough for an introduction! You should know enough by now
-                \item If you have corrections or suggestions, \bhref{mailto:federico.zenith@sintef.no}{send them to me!}
-            \end{itemize}
-        \end{frame}
-        
-    \begin{frame}
-        \begin{block}{block}
-            block
-        \end{block}
-        \begin{exampleblock}{example}
-            example
-        \end{exampleblock}
-        \begin{alertblock}{alert}
-            alert
-        \end{alertblock}
-    \end{frame}
+\end{frame}
 
-        \QApage
-        
-    \end{document}
+\section{Problem}
+
+\begin{frame}{Problem Formulation}
+    \small
+    \[
+        \mathbf{x} = [x,\, y,\, \psi,\, \phi,\, v]^\top,
+        \qquad
+        \mathbf{u} = [\phi_{\mathrm{cmd}},\, T]^\top
+    \]
+
+    \begin{itemize}
+        \item Objective: drive a Boeing 747 model to track a counterclockwise circular reference while maintaining the target speed.
+        \item Reference geometry: circle centered at $(0,0)$ with $R = 120{,}000\,\mathrm{m}$ and $v_{\mathrm{ref}} = 210\,\mathrm{m/s}$.
+        \item Performance goals: reduce cross-track error, keep heading and bank response smooth, respect bank/thrust limits, and regulate speed.
+        \item Assumptions: planar flight, quasi-steady drag, discrete control update, and Gaussian measurement noise.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Why This Workflow Matters}
+    \small
+    \begin{itemize}
+        \item The project connects optimization, differential-equation solving, and uncertainty-aware estimation in one aerospace workflow.
+        \item LQR offers predictable tuning and stable heading-bank regulation for circular tracking.
+        \item RK4 improves nonlinear propagation accuracy compared with low-order integration.
+        \item Bayesian estimation quantifies innovation, posterior error, and covariance contraction under noisy measurements.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Simulation Interface Overview}
+    \centering
+    \includegraphics[width=\textwidth,height=0.98\textheight,keepaspectratio]{latex/assets/overview.png}
+\end{frame}
+
+\section{Methodology}
+
+\begin{frame}{Integrated Architecture}
+    \centering
+    \includegraphics[width=0.95\textwidth]{latex/assets/system_architecture.png}
+\end{frame}
+
+\begin{frame}{Modeling and Algorithms}
+    \scriptsize
+    \begin{block}{Nonlinear Planar Dynamics}
+        The five-state model propagates position, heading, bank angle, and speed. The heading rate follows $\dot{\psi} = \frac{g \tan \phi}{v}$, while bank angle follows a first-order lag and speed is driven by thrust minus aerodynamic drag.
+    \end{block}
+
+    \begin{block}{Control, Integration, and Estimation}
+        \setlength{\itemsep}{0.2em}
+        \begin{itemize}
+            \item LQR stabilizes heading and bank-angle errors around the circular-tracking reference.
+            \item RK4 propagates the nonlinear dynamics at $\Delta t = 0.05\,\mathrm{s}$ over an $800\,\mathrm{s}$ horizon.
+            \item A Gaussian Bayes/MAP estimator processes noisy measurements and reports estimation consistency.
+        \end{itemize}
+    \end{block}
+
+    \begin{alertblock}{Baseline Setup}
+        The aircraft starts $2\,\mathrm{km}$ outside the target circle, and the evaluation tracks error, speed, actuator usage, runtime, and estimation consistency.
+    \end{alertblock}
+\end{frame}
+
+\section{Results}
+
+\begin{frame}{Nominal Closed-Loop Performance}
+    \begin{columns}[T]
+        \begin{column}{0.58\textwidth}
+            \scriptsize
+            \renewcommand{\arraystretch}{1.12}
+            \begin{tabular}{|p{0.60\linewidth}|p{0.26\linewidth}|}
+                \hline
+                \textbf{Metric} & \textbf{Value} \\
+                \hline
+                Final cross-track error & $0.218\,\mathrm{m}$ \\
+                \hline
+                Cross-track RMSE after transient & $5.56\,\mathrm{m}$ \\
+                \hline
+                Settling time to $|e_{ct}|<100\,\mathrm{m}$ & $78.35\,\mathrm{s}$ \\
+                \hline
+                Heading error RMSE & $2.31^\circ$ \\
+                \hline
+                Max bank angle & $27.67^\circ$ \\
+                \hline
+                Speed RMSE to $210\,\mathrm{m/s}$ & $0.276\,\mathrm{m/s}$ \\
+                \hline
+                Control / estimator time & \shortstack{$0.0165\,\mathrm{ms}$\\$0.0344\,\mathrm{ms}$} \\
+                \hline
+            \end{tabular}
+        \end{column}
+        \begin{column}{0.42\textwidth}
+            \small
+            \begin{itemize}
+                \item The controller removes the initial offset quickly and reaches very small steady-state error.
+                \item Bank angle stays inside the $35^\circ$ envelope, and saturation is rare.
+                \item Speed remains tightly clustered around the $210\,\mathrm{m/s}$ reference.
+                \item Runtime is negligible compared with the $50\,\mathrm{ms}$ control interval.
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Tracking Performance}
+    \begin{columns}[T]
+        \begin{column}{0.63\textwidth}
+            \includegraphics[width=\linewidth,height=0.99\textheight,keepaspectratio]{latex/assets/simulation_overview.png}
+        \end{column}
+        \begin{column}{0.37\textwidth}
+            \small
+            \begin{itemize}
+                \item The aircraft starts outside the target circle and converges smoothly to the desired orbit.
+                \item Heading, bank angle, and speed remain bounded and physically reasonable throughout the maneuver.
+                \item The transient is well damped, and the steady-state motion stays close to the reference circle.
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Sensitivity and Controller Trade-Off}
+    \begin{columns}[T]
+        \begin{column}{0.58\textwidth}
+            \includegraphics[width=\linewidth,height=0.99\textheight,keepaspectratio]{latex/assets/lqr_weight_sensitivity.png}
+        \end{column}
+        \begin{column}{0.42\textwidth}
+            \footnotesize
+            \setlength{\itemsep}{0.45em}
+            \begin{itemize}
+                \item Aggressive LQR tuning improves tracking but increases peak bank demand and saturation risk.
+                \item Conservative tuning saves control effort but weakens correction.
+                \item The baseline weights provide the best balance between responsiveness and actuator margin.
+                \item Other sensitivity studies show only mild variation under tested time-step and radius changes.
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{RK4 vs. Euler Validation}
+    \begin{columns}[T]
+        \begin{column}{0.6\textwidth}
+            \includegraphics[width=\linewidth,height=0.99\textheight,keepaspectratio]{latex/assets/rk4_vs_euler_project.png}
+        \end{column}
+        \begin{column}{0.4\textwidth}
+            \small
+            \begin{itemize}
+                \item The recreated benchmark matches the independent numerical check in the report.
+                \item RK4 achieves about $16.46\times$ lower final total state error than Euler.
+                \item This supports using RK4 as the default propagator for the nonlinear B747 model.
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{State Estimation Insights}
+    \begin{columns}[T]
+        \begin{column}{0.62\textwidth}
+            \includegraphics[width=\linewidth,height=0.99\textheight,keepaspectratio]{latex/assets/part3_estimation.png}
+        \end{column}
+        \begin{column}{0.38\textwidth}
+            \small
+            \begin{itemize}
+                \item The posterior covariance contracts after each measurement update.
+                \item Posterior accuracy only improves slightly because the process and measurement uncertainties are of similar scale.
+                \item In the current version, the estimator is used for diagnostics rather than feedback control.
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\section{Conclusions}
+
+\begin{frame}{Discussion and Future Work}
+    \small
+    \begin{itemize}
+        \item Strengths: stable circular tracking, low computational cost, clear controller-estimator architecture, and interpretable uncertainty diagnostics.
+        \item Main limitations: planar flight assumption, simplified actuator and disturbance modeling, first-order discretization in LQR design, and true-state feedback instead of estimated-state feedback.
+        \item Future work: close the loop around estimated states, add wind/disturbances, compare with MPC or nonlinear guidance laws, and extend toward higher-fidelity aircraft dynamics.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Group Contributions}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Yufa You}
+                \small
+                \begin{itemize}
+                    \item Topic selection
+                    \item Core code implementation
+                    \item Algorithm design
+                    \item Report drafting
+                    \item Contribution: 50\%
+                \end{itemize}
+            \end{block}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Ruige Yang}
+                \small
+                \begin{itemize}
+                    \item Formula derivation
+                    \item Experimental result organization
+                    \item Presentation preparation
+                    \item Final material consistency check
+                    \item Contribution: 50\%
+                \end{itemize}
+            \end{block}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\QApage
+
+\end{document}
