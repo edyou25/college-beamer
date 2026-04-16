@@ -1,67 +1,100 @@
 # BarrierNet Presentation Script
 
-Target length: about 12 minutes for presentation, followed by 4 minutes of Q\&A.
+Target length: about 12 minutes, followed by Q&A.
 
-## Section I - Introduction
+Note: the current Beamer theme automatically inserts section transition pages, so the final PDF has 22 pages. This script follows that exact slide order.
 
-### Slide 1 - Title (0:00-0:20)
-Good afternoon. Today I will present the paper "BarrierNet: Differentiable Control Barrier Functions for Learning of Safe Robot Control" by Wei Xiao, Ramin Hasani, Xiao Li, and Daniela Rus, published in IEEE Transactions on Robotics in 2023. The paper addresses a fundamental question in safe autonomy: how to combine neural-network control with formal safety guarantees.
+## Slide 1 - Title (0:00-0:20)
 
-### Slide 2 - Introduction: Topic and Purpose (0:20-0:55)
-This slide gives the overall purpose of the work. The motivation is that robots need an explicit safety layer, especially when they are controlled by learned policies. The method proposed in the paper is BarrierNet, which uses neural networks together with control barrier functions to generate safe control actions. So the presentation will move from the problem background, to prior work, to the method itself, and then to the experimental evidence.
+Good afternoon. Today I will present the paper "BarrierNet: A Safety-Guaranteed Layer for Neural Networks." The work studies a central problem in robotics: how to use learning-based control while still keeping formal safety guarantees. My presentation will cover the motivation, prior work and gap, the BarrierNet method, experimental results, and then a short conclusion.
 
-### Slide 3 - Introduction: Why Safe Learning Is Still Hard (0:55-1:45)
-The problem is important because modern robots increasingly rely on neural controllers that are flexible and data-efficient. However, in safety-critical tasks such as autonomous driving or obstacle avoidance, one wrong action can lead to serious damage. Classical safety filters can provide guarantees, but they are often hand-designed and too conservative. So the central challenge is not only how to be safe, but how to be safe without sacrificing too much performance.
+## Slide 2 - Section Transition: Introduction (0:20-0:30)
 
-## Section II - Literature Review
+I will start with the introduction and explain why this problem matters.
 
-### Slide 4 - Literature Review: Prior Work and Gap (1:45-2:40)
-The paper is positioned at the intersection of several research lines. Standard CBF and HOCBF methods are strong because they provide formal safety guarantees. Differentiable QP layers are also useful because they support end-to-end learning. Adaptive CBFs reduce conservatism, but they require auxiliary dynamics that are difficult to design. The gap identified by the authors is that existing safety layers are usually either safe but rigid, or trainable but not truly adaptive. BarrierNet is proposed to fill this gap by being trainable, interpretable, adaptive, and still theoretically safe.
+## Slide 3 - Motivation & Method (0:30-1:20)
 
-## Section III - Methods and Procedures
+This slide gives the main idea of the paper. The motivation is straightforward: robots often operate in environments with obstacles, so they need an explicit safety layer rather than relying only on a neural controller. The method proposed here is BarrierNet, which combines neural networks with barrier-function-based safety constraints. In simple terms, the network helps shape the safety rule, while the final action is still filtered through a mathematically safe layer.
 
-### Slide 5 - Methods and Procedures: BarrierNet Architecture (2:40-3:25)
-This slide shows the overall architecture. A neural network processes the robot state and the environment observation. Its outputs are then passed to a BarrierNet layer rather than being used directly as the final control. Inside the BarrierNet layer, a differentiable quadratic program modifies the action so that the safety constraints are respected. The key novelty is that the barrier terms are no longer fixed. Instead, they depend on trainable penalty functions, which are conditioned on the environment.
+## Slide 4 - Why BarrierNet? (1:20-2:00)
 
-### Slide 6 - Methods and Procedures: Mathematical Formulation (3:25-4:15)
-The technical core is shown here. In a standard HOCBF, the recursive barrier terms depend only on the system state. In BarrierNet, each term is multiplied by a positive penalty function that depends on the observation variable z. This allows the safety constraint to become tighter or looser depending on the scene. The final action is then produced by a differentiable quadratic program, which means the whole controller can still be trained end to end by backpropagation.
+This figure shows the tradeoff the paper is trying to solve. End-to-end learning can explore more free space and often behaves aggressively, but it may collide because it has no hard safety mechanism. Model predictive control is usually stable and safe, but it can be overly conservative. BarrierNet is designed to find a middle ground: safer than plain learning, but less rigid than classical conservative controllers.
 
-### Slide 7 - Methods and Procedures: Safety Guarantee (4:15-4:55)
-The paper also includes a theorem. If the learned penalty functions are Lipschitz continuous, then the BarrierNet controller guarantees that the user-defined safety constraints remain satisfied. This is important because the safety claim is not only empirical. At the same time, the theorem depends on several assumptions: the system dynamics are known, the safe sets are predefined, and the implementation is discrete-time. So the guarantee is real, but it is not assumption-free.
+## Slide 5 - Section Transition: Prior Work and Gap (2:00-2:10)
 
-### Slide 8 - Methods and Procedures: Experimental Procedures (4:55-5:30)
-To evaluate the method, the paper uses three case studies: traffic merging, 2D robot navigation, and 3D robot navigation. Training labels are generated by offline optimal or CBF-based controllers. The evaluation focuses on four dimensions: safety, adaptivity, closeness to the expert solution, and runtime. This is a reasonable design because it compares BarrierNet not only with plain neural controllers, but also with fixed safety filters.
+Next I move to prior work and the research gap that motivates this paper.
 
-### Slide 9 - Methods and Procedures: Traffic Merging Setup (5:30-6:05)
-The first case study is traffic merging. Each connected autonomous vehicle must merge safely while minimizing travel time and control effort. The safety rule is based on a rear-end distance constraint with a reaction-time term. This setup is useful because safety becomes important only near the critical region, so it clearly reveals whether a controller is too conservative or not safe enough.
+## Slide 6 - Prior Work (2:10-2:50)
 
-### Slide 10 - Methods and Procedures: 2D Robot Navigation Setup (6:05-6:40)
-The second setup is 2D robot navigation with a circular obstacle. The robot follows nonlinear unicycle dynamics, and the safety constraint has relative degree two. During training, the obstacle radius is fixed at six meters, and the labels are generated by a CBF controller. This case is stronger than the traffic example because it involves nonlinear dynamics and a direct comparison with DFB, which is a fixed safety filter.
+The paper builds on three main lines of prior work. First, control barrier functions, especially HOCBF methods, are attractive because they give formal safety guarantees. Second, differentiable quadratic-program layers are useful because they allow optimization-based control to remain trainable end to end. Third, adaptive CBF ideas already suggest that conservatism can be reduced. However, those adaptive methods usually require extra auxiliary dynamics or hand-designed mechanisms, which limits practicality.
 
-## Section IV - Results and Discussion
+## Slide 7 - Research Gap (2:50-3:30)
 
-### Slide 11 - Results and Discussion: Traffic Results (6:40-7:35)
-The traffic results show that the plain fully connected network can imitate the labels reasonably well, but it cannot guarantee safety. BarrierNet, in contrast, keeps the safety metric near or above the required threshold. At the same time, Table 2 shows that its runtime is below one hundredth of a second and its performance is close to optimal. One useful detail is that the authors openly acknowledge a remaining issue: if the expert trajectory lies exactly on the safety boundary, discrete sampling may still create small inter-sampling problems.
+So the gap is clear. Standard CBF parameters are usually fixed, which makes the controller safe but often rigid. Some adaptive variants exist, but they are hard to design and tune. Other safety filters can keep the system safe, but still remain too conservative. What is missing is a safety layer that is trainable, interpretable, environment-dependent, and still mathematically safe. BarrierNet is proposed as the answer to that gap.
 
-### Slide 12 - Results and Discussion: 2D Navigation Results (7:35-8:35)
-The 2D navigation results make the main contribution clearer. The FC controller collides because it has no formal safety mechanism. DFB remains safe, but it deviates more from the expert trajectory, so it is more conservative. BarrierNet stays safe while remaining much closer to the ground-truth controls and trajectory. So the main benefit is not only safety. It is a better balance between safety and performance.
+## Slide 8 - Section Transition: Methods and Procedures (3:30-3:40)
 
-### Slide 13 - Results and Discussion: Generalization and 3D Extension (8:35-9:25)
-This slide extends the argument. On the left, when the obstacle becomes larger than the one used during training, BarrierNet still adapts and stays safer than the FC model, while also being less conservative than DFB. On the right, the paper also presents a 3D navigation problem with a superquadratic obstacle. BarrierNet still avoids collision and stays close to the reference path. This suggests that the method generalizes beyond a single simple benchmark.
+Now I will explain how BarrierNet works and how the experiments were designed.
 
-### Slide 14 - Results and Discussion: Critical Evaluation (9:25-10:30)
-My evaluation is that this is a strong paper because it connects control theory and learning in a clean and principled way. The adaptive penalty functions are interpretable, the runtime is practical, and the theory is stronger than a purely empirical deep-learning solution. However, the limitations are also clear. The approach assumes known dynamics and predefined safe sets, the number of constraints is fixed during training, and the evidence is mainly from simulation with a limited range of baselines. So I would describe BarrierNet as a promising safety layer, but not yet a complete solution to real-world uncertainty.
+## Slide 9 - BarrierNet Architecture (3:40-4:30)
 
-## Section V - Conclusion and Q\&A
+This is the system architecture. The inputs are the robot state x and the environment observation z. Inside BarrierNet, the key ingredients are trainable penalty functions, higher-order control barrier function constraints, and a differentiable quadratic-program layer. The important point is that the neural network does not directly output the final control action. Instead, the final output is a safe action u-star that is computed by an optimization layer, so safety constraints remain active during inference.
 
-### Slide 15 - Conclusion (10:30-11:20)
-To conclude, BarrierNet turns HOCBF-based safety constraints into a trainable differentiable layer. Its main advantage over standard safety filters is adaptive conservatism: it is safer than a plain neural network, but usually less conservative than a fixed filter such as DFB. The strongest evidence comes from the traffic merging and 2D navigation results, where BarrierNet keeps safety while remaining close to expert behavior. Overall, I think the paper makes a meaningful step toward safer robot learning.
+## Slide 10 - Mathematical Formulation (4:30-5:20)
 
-### Slide 16 - Q\&A (11:20-12:00)
+This slide is the mathematical core of the paper. In standard HOCBF design, the coefficients are fixed. BarrierNet replaces those fixed coefficients with learned positive penalty functions p_i of z, so the safety margin can change with the environment. The final safe action is then obtained from a differentiable quadratic program. This matters for two reasons. First, the controller can adapt its conservatism depending on the scene. Second, because the QP is differentiable, the entire pipeline can still be trained end to end by backpropagation.
+
+## Slide 11 - Experimental Procedures (5:20-5:55)
+
+The experimental design includes three case studies: traffic merging, 2D robot navigation, and 3D robot navigation. Training labels come from offline optimal or CBF-based controllers. The authors evaluate four main aspects: safety, adaptivity, closeness to the expert solution, and runtime. This is a sensible setup because the paper is not only asking whether BarrierNet is safe, but also whether it stays useful and efficient.
+
+## Slide 12 - Case Study 1: Traffic Merging (5:55-6:35)
+
+The first benchmark is traffic merging for connected autonomous vehicles. The goal is to control vehicles in a merging zone while minimizing travel time and control effort. The safety rule is a rear-end distance constraint with a reaction-time term. This case is a good benchmark because the safety constraint becomes important mainly near the critical merging region. So it clearly reveals whether a controller is unsafe or just too conservative.
+
+## Slide 13 - Case Study 2: 2D Robot Navigation (6:35-7:10)
+
+The second benchmark is 2D navigation for a unicycle robot. The obstacle is represented by a circular safety constraint, and the dynamics are nonlinear. This case matters because the safety constraint has relative degree two, which is more challenging than simple first-order settings. It is also a more recognizable robotics scenario, so it gives a clearer picture of practical obstacle avoidance.
+
+## Slide 14 - Case Study 3: 3D Robot Navigation (7:10-7:40)
+
+The third benchmark extends the problem to 3D navigation. Here the robot has double-integrator dynamics and three acceleration inputs, and the obstacle is superquadratic rather than a simple circle or sphere. This case matters because it tests whether BarrierNet can move beyond small planar examples and still handle more complex geometry and higher-dimensional control.
+
+## Slide 15 - Section Transition: Results and Discussion (7:40-7:50)
+
+With the setup defined, I now move to the main results and their implications.
+
+## Slide 16 - Traffic Merging Results (7:50-8:35)
+
+In the traffic case, the plain fully connected network can imitate the expert labels, but it cannot guarantee safety. BarrierNet performs much better on that point and keeps the safety metric near or above the required threshold. This means the added safety layer is doing real work, not just reproducing the expert policy. At the same time, the paper also notes a limitation: if the expert trajectory lies exactly on the safety boundary, discrete sampling may still create small boundary issues. So the result is strong, but not completely free of implementation details.
+
+## Slide 17 - 2D Navigation Results (8:35-9:20)
+
+The 2D navigation results make the contribution even clearer. The FC controller collides because it has no formal safety mechanism. DFB remains safe, but it detours more because its barrier parameters are fixed, so it is more conservative. BarrierNet stays safe while tracking the ground-truth controls and trajectory more closely. So the advantage is not just safety alone. The main advantage is a better balance between safety and task performance.
+
+## Slide 18 - Generalization and 3D Extension (9:20-10:00)
+
+This slide shows two additional strengths. On the left, in the 2D out-of-distribution test, the obstacle is larger than the one seen during training, and BarrierNet still adapts better than the fixed-filter baseline. On the right, the same idea also works in the 3D case with a superquadratic obstacle. Together, these results suggest that the method is not tied to one narrow benchmark and has some meaningful generalization ability.
+
+## Slide 19 - Discussion (10:00-10:50)
+
+My evaluation is mixed but positive. The main strengths are that the paper combines control theory and deep learning in a clean way, provides a theoretical safety basis instead of only empirical success, and introduces learned penalty functions that are still interpretable. The runtime is also realistic for online use. But the limitations are important. The method assumes known dynamics and predefined safe sets, the number of constraints is fixed in advance, and most evidence comes from simulation. So my judgement is that BarrierNet is a convincing safety layer, but not yet a complete solution to uncertainty, perception error, or deployment in the real world.
+
+## Slide 20 - Section Transition: Conclusion and Q&A (10:50-11:00)
+
+Finally, I will summarize the take-away from the paper.
+
+## Slide 21 - Conclusion (11:00-11:40)
+
+The conclusion is consistent with the motivation at the beginning. BarrierNet tries to find a middle ground between exploration and safety. Compared with plain end-to-end learning, it adds formal protection against unsafe actions. Compared with fixed safety filters, it is more adaptive and less conservative. Overall, the paper makes a meaningful contribution because it shows that neural control does not have to choose between flexibility and safety quite so sharply.
+
+## Slide 22 - Q&A (11:40-12:00)
+
 Thank you for listening. I am happy to take questions.
 
-## Possible Q\&A Prompts
-- Why is BarrierNet better than simply adding a standard CBF filter after a neural controller?
+## Possible Q&A Prompts
+
+- Why is BarrierNet better than attaching a fixed CBF filter after a neural controller?
 - Does the method still work if the system dynamics are inaccurate?
-- What is the main difference between adaptive CBF and BarrierNet?
-- How serious is the inter-sampling issue in real deployment?
+- What is the practical difference between adaptive CBF methods and BarrierNet?
+- How serious is the boundary issue caused by discrete sampling?
