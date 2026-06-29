@@ -1,0 +1,213 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+%        1         2         3         4         5         6         7         8
+
+\documentclass[letterpaper, 10 pt, conference]{ieeeconf}  % Comment this line out if you need a4paper
+
+%\documentclass[a4paper, 10pt, conference]{ieeeconf}      % Use this line for a4 paper
+
+\IEEEoverridecommandlockouts                              % This command is only needed if 
+                                                          % you want to use the \thanks command
+
+\overrideIEEEmargins                                      % Needed to meet printer requirements.
+
+% The following packages can be found on http:\\www.ctan.org
+\usepackage{url} % for URL formatting in references
+\usepackage{graphicx} % for pdf, bitmapped graphics files
+\usepackage[caption=false,font=footnotesize]{subfig}
+%\usepackage{epsfig} % for postscript graphics files
+%\usepackage{mathptmx} % assumes new font selection scheme installed
+%\usepackage{times} % assumes new font selection scheme installed
+%\usepackage{amsmath} % assumes amsmath package installed
+%\usepackage{amssymb}  % assumes amsmath package installed
+
+\title{\LARGE \bf
+Physical Human-Robot Interaction: A Review from the Guide Robot Perspective
+}
+
+
+\author{Yufa You and Hailong Huang% <-this % stops a space
+\thanks{Yufa You and Hailong Huang are with the Department of Aeronautical and Aviation Engineering, The Hong Kong Polytechnic University, Hong Kong 999077 (e-mail: yufa.you@connect.polyu.hk and hailong.huang@polyu.edu.hk).}%
+}
+
+
+\begin{document}
+
+\bstctlcite{IEEEexample:BSTcontrol}
+
+
+
+\maketitle
+\thispagestyle{empty}
+\pagestyle{empty}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+
+Physical human-robot interaction (pHRI) is a key technology to achieve safe and natural human-robot collaboration. Using guide robots as a representative case study, this article offers a systematic review of the three developmental stages of pHRI research in guidance applications: system modeling and optimization solving, model-based interaction, and data-driven interaction. By comparing representative works across dimensions including modeling approaches, time scales, computational complexity, interpretability, and applicable scenarios, we identify two bottlenecks in existing methods: incompatibility between long-term efficiency and real-time interaction, and limited policy multimodality. We further distill two key research directions: the design of hybrid architectures integrating learning-based and model-based interaction and multimodal planning with global optimality. The insights from this review can provide reusable methodologies for broader pHRI applications like collaborative transportation, service guidance, and human-robot co-driving.
+
+\end{abstract}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{INTRODUCTION}
+
+Physical Human–Robot Interaction (pHRI) has emerged as a critical research direction as robotics transitions from isolated autonomy to physical collaboration with humans \cite{xiao_robotic_2021, chen_quadruped_2023, noauthor_reaction_2019}. with widespread applications in collaborative manufacturing, medical rehabilitation, assistive devices, logistics handling, and human-robot co-driving in autonomous vehicles. In such systems, humans are no longer external operators but become tightly coupled decision-making agents at the physical level with the robot, requiring planning and control methods to simultaneously consider task efficiency, safety, and interaction comfort.
+
+Technically, pHRI can be understood through three key elements: modeling human–robot systems, which is challenging due to significant individual differences in human dynamics and response patterns; designing interaction mechanisms, focusing on how the robot generates forces and responds to those applied by humans; and planning the interaction process, with objectives that have expanded from trajectory tracking to optimizing the overall human–robot interaction experience.
+
+Despite recent advances, pHRI continues to face significant challenges. The bidirectional physical coupling between humans and robots leads to system behavior that is highly nonlinear and time-varying, while human behavior itself remains inherently uncertain. Moreover, practical pHRI tasks often demand the simultaneous management of global navigation and real-time interaction control, further complicating robot planning and control.
+
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.48\textwidth]{assets/1.pdf}
+    \caption{Guide Robot and General pHRI Relationship}
+    \label{fig:phri-relationship}
+\end{figure}
+
+
+Among various pHRI applications, guide robots offer a representative perspective for studying planning and control methods \cite{lyu_robotic_2025, cai_navigating_2024} (Fig.~\ref{fig:phri-relationship}). Guide robot systems encompass rich technical components, typically requiring the integration of perception, path planning, interaction control, and certain learning mechanisms, with corresponding research spanning key technical approaches across different stages of pHRI development. At the same time, guidance scenarios are highly complex, involving long-duration human–robot collaboration, navigation over challenging terrains, and stringent requirements for interaction comfort. These factors pose additional challenges for the design and implementation of pHRI systems.
+
+This paper focuses on physical human–robot interaction research, exemplified by guide robots, and provides a systematic review of existing work from a planning and control perspective. The scope of this review is limited to studies involving physical human–robot interaction, excluding works that focus solely on vision, speech, or perception. The main contributions of this paper are threefold:
+\begin{enumerate}
+    \item Systematically organizing guide robot research into three developmental stages.
+    \item Conducting a comparative analysis of existing pHRI guide studies horizontally. 
+    \item Identifying two major challenges currently facing pHRI to guide future research. 
+\end{enumerate}
+
+\section{REVIEW OF pHRI GUIDANCE TECHNOLOGIES}
+
+\subsection{Stage I: system modeling and optimization solving}
+
+In traditional robotic systems, human-applied interaction forces are typically treated either as part of the control input or as external disturbances. To establish interaction mechanisms capable of completing guidance tasks, early guide robot research primarily followed the technical route of human–robot system modeling combined with optimization-based planning. The core objective was to develop a system model for physical human–robot interaction and, based on this model, determine optimal guidance paths that satisfy both safety and guidance requirements. During this stage, researchers typically modeled the guide robot and human as a coupled dynamical system. Human-applied interaction forces were explicitly incorporated to describe the system dynamics as the combined effect of robot control and human inputs. These approaches generally use explicit dynamical equations to describe system dynamics, providing planning and control problems with well-defined physical meaning and interpretability.
+
+\begin{figure}[htbp]
+    \centering
+    \subfloat[Technical evolution timeline.]{\includegraphics[width=0.48\textwidth]{assets/2_1.pdf}}
+    \\
+    \subfloat[Cross-comparison of key characteristics.]{\includegraphics[width=0.48\textwidth]{assets/2_2.pdf}}
+    \caption{Comparison of three pHRI development stages.}
+    \label{fig:three-stages}
+\end{figure}
+
+Building upon these modeling and optimization foundations, subsequent studies moved toward implementation, where different interaction media and modeling assumptions naturally led to diverse system realizations. At the implementation level, related research has explored a variety of approaches involving different physical structures and interaction modalities. Xiao et al. \cite{xiao_robotic_2021} proposed a guide system modeling method that introduces a taut–slack state-switching model to describe flexible leash interaction processes and establishes simplified force–velocity linear relationships based on experimental data, enabling the prediction and planning of human–robot collaborative behavior. Under such modeling frameworks, model predictive control, mixed-integer optimization, or search-based planning methods are commonly employed to globally optimize collaborative walking trajectories over finite horizons. Chen et al. \cite{chen_quadruped_2023} further proposed a hierarchical planning framework that decouples human path planning from robot obstacle avoidance and dynamic constraints, guiding the robot to generate safe and consistent guidance paths by predicting human motion trends under interaction forces.
+
+Beyond flexible leashes, some studies have investigated alternative interaction media, such as elastic cords and rigid rods, as well as various robot structural forms, including two-wheeled, single-wheeled, quadruped, and wheel-legged biped designs \cite{noauthor_reaction_2019, yuan_omnidirectional_2024, li_budd-e_2025, lan_adaptive_2025}. Cai et al. \cite{cai_navigating_2024} conducted a systematic comparative analysis of guide robots, traditional white canes, and smart canes from an application perspective, evaluating differences in interaction effects and user experience across guidance solutions. Hong et al. \cite{hong_research_2023} further assessed the advantages and limitations of different interaction media based on experimental data, providing practical recommendations for selecting appropriate guidance mechanisms in diverse scenarios.
+
+
+Methods at this stage exhibit several notable advantages. Explicit dynamics modeling confers strong interpretability and supports the prediction of human–robot collaborative trajectories over extended horizons, making these approaches well suited to guidance scenarios with relatively simple environments and well-defined task objectives. Nevertheless, their limitations are also evident. Performance is highly dependent on the accuracy of human–robot coupled dynamics modeling and parameter identification, where model bias can significantly affect discrete interaction state estimation and switching reliability. In addition, the computational burden associated with nonlinear optimization restricts real-time applicability in complex or highly dynamic environments and may introduce challenges in handling multimodal trajectory representations. Moreover, these approaches are inherently limited in modeling rapid human intention changes, restricting their capability to optimize real-time interaction experience.. Experimental evidence indicates that while such methods achieve high trajectory tracking accuracy in indoor, flat environments, they remain less effective in addressing human behavioral diversity and adapting to complex scenarios.
+
+\subsection{Stage II: Real-Time Interaction Control}
+
+With the maturation of guide robot research and the growth of application demands, the focus has progressively shifted from modeling and planning fundamental interaction mechanisms to control strategies that emphasize real-time interaction performance. In contrast to Stage I approaches centered on global optimality and long-horizon prediction, Stage II methods prioritize instantaneous robot responses during physical human–robot interaction to improve stability, compliance, and interaction naturalness.
+
+At this stage, research primarily aims to enable real-time perception and response to human interaction forces via compliance control and force observation. Representative methods adopt impedance- or admittance-based force–motion mappings \cite{scherzinger_forward_2017}, specifying desired dynamics to produce compliant behavior during physical interaction. To alleviate dependence on dedicated force sensors, force observers and state estimation techniques are commonly used to estimate external forces from proprioceptive signals. Meanwhile, online parameter identification is applied to address uncertainties caused by payload changes, center-of-mass variations, and environmental disturbances. More recently, human motion perception and short-term prediction have been integrated to improve responsiveness to human motion trends \cite{yu_human-centered_2025}.
+
+Within guide robot research, several representative approaches have been proposed. Du et al. \cite{du_comfortable_2023} achieve a balance between guidance effectiveness and walking comfort via compliance control, improving the naturalness of cooperative walking. Fan et al. \cite{fan_force-compliance_2025} combine force control with model predictive control and introduce control barrier functions to explicitly enforce safety constraints. Gu et al. \cite{gu_adaptive_2025, gu_hierarchical_2025} focus on flexible manipulator dynamics modeling, improving stability under complex terrain and external force disturbances through integral inverse control. Akhdan et al. \cite{akhdan_guiding_2024} represent the human–robot interaction as a truck–trailer system, using multi-carriage models to describe the dynamics of human guidance.
+
+Methods at this stage demonstrate clear advantages in real-time responsiveness and interaction quality. By directly reacting to human-applied forces, robots can rapidly adapt to sudden changes in unstructured environments, resulting in more natural and acceptable interaction. Nevertheless, these approaches also exhibit notable limitations. To enhance local responsiveness, long-term planning capabilities are often weakened or omitted, making it difficult to ensure global guidance effectiveness and behavioral consistency over extended horizons. In addition, such systems typically comprise multiple tightly coupled modules, including force observation, parameter identification, and motion prediction, leading to increased model complexity and potential error accumulation across modules. Furthermore, these methods primarily emphasize passive compliance to human behavior to improve interaction experience, while active guidance capabilities at the level of long-term autonomy and intention shaping remain limited. Experimental studies show that although stable interaction can be maintained under ramps, stairs, and multi-directional external force disturbances, overall performance in complex long-term guidance tasks still requires further improvement.
+
+\subsection{Stage III: Data-driven interaction policy learning}
+
+In recent years, rapid advances in deep learning and reinforcement learning have driven the increasing adoption of data-driven approaches in guide robot research, introducing new paradigms for physical human–robot interaction. In contrast to Stage I, which relies on explicit dynamics modeling, and Stage II, which emphasizes real-time force-based interaction control, Stage III focuses on leveraging data to capture complex nonlinear characteristics of human–robot interaction and to realize adaptive interaction strategies in unstructured and uncertain environments.
+
+The core idea of this stage is to leverage machine learning techniques to learn human–robot collaborative behavior patterns from large-scale interaction data or simulated experience. From a methodological perspective, three main categories of approaches can be identified. Aliotta et al. \cite{aliotta_understanding_2025} and Ma et al. \cite{ma_mgl4qgr_2024} explored reinforcement learning–based policy optimization methods by simulating human-applied interaction forces in virtual environments and optimizing interaction objectives using algorithms such as PPO and SAC, with trained policies transferred to real systems via teacher–student distillation frameworks. Other studies investigated supervised learning–based behavior prediction approaches \cite{zhou_bvip_2024}, employing temporal models such as TCNs and LSTMs to learn human response patterns from historical interaction data and establish force–motion mapping relationships \cite{kim_transforming_2023, akhdan_guiding_2024}. More recent work has focused on hybrid frameworks that integrate learning with online adaptation mechanisms, including Rapid Motor Adaptation (RMA) \cite{ma_mgl4qgr_2024} and neural network–enhanced model predictive control (NN-MPC) \cite{zhou_bvip_2024}, enabling real-time identification and compensation for environmental variations and individual differences.
+
+
+In the guide robot domain, research has begun to yield preliminary results. Ma et al. \cite{ma_mgl4qgr_2024} employ reinforcement learning within the Rapid Motor Adaptation (RMA) framework to train multi-gait strategies for quadruped guide robots across 4,096 parallel simulation environments, enabling online adaptation to diverse terrains and interaction patterns. Zhou et al. \cite{zhou_bvip_2024, lyu_robotic_2025} integrate temporal prediction using TCNs with differentiable model predictive control, optimizing coordination between human motion prediction and robot control through end-to-end learning. Kim et al. \cite{kim_transforming_2023} introduce the Delayed Harness model, framing the guidance task as a Markov decision process and employing reinforcement learning to optimize robot path guidance strategies in complex environments.
+
+Methods at this stage exhibit notable advantages in managing complex nonlinear human–robot interactions and adapting to unstructured environments. Data-driven learning paradigms enable the capture of interaction patterns that are difficult to explicitly model, while online adaptation mechanisms provide flexibility to accommodate environmental variations and individual differences. Nevertheless, several limitations remain. Reinforcement learning approaches typically demand extensive training data, imposing high requirements on simulation fidelity and computational resources. The black-box nature of neural networks also hinders interpretability and system verification, potentially raising trust concerns in safety-critical guidance scenarios. Moreover, the simulation-to-reality (Sim-to-Real) gap continues to constrain practical deployment. Experimental results demonstrate that these methods can achieve zero-shot deployment on real robots across challenging terrains, such as 25° ramps and stairs, and support longer guidance trajectories exceeding 100 meters \cite{ma_mgl4qgr_2024, kim_transforming_2023}; however, further research is necessary to enhance interaction safety and improve system interpretability.
+
+\subsection{Method Comparison and Common Limitations}
+
+To clarify the evolutionary trajectory of pHRI guidance technology, Fig.~2 summarizes and compares the three stages across five dimensions, including modeling approach, time scale, computational complexity, interpretability, and applicable scenarios. Stage~I is based on explicit physical modeling, providing strong interpretability and reliable long-term prediction, but often at the cost of high computational complexity. Stage~II focuses on online perception and compliant control of interaction forces, prioritizing real-time responsiveness and interaction naturalness, while typically sacrificing long-horizon planning capability. Stage~III leverages neural networks to learn complex nonlinear and multimodal interaction behaviors, enabling adaptive guidance in unstructured environments, although challenges remain in data efficiency, interpretability, and safety verification. From an application perspective, works by Xiao et al. and Chen et al. \cite{xiao_robotic_2021, chen_quadruped_2023} primarily follow Stage~I to achieve interpretable long-term planning and rapid system prototyping; Du et al., Fan et al., and Gu et al. \cite{du_comfortable_2023, fan_force-compliance_2025, gu_adaptive_2025, gu_hierarchical_2025} adopt Stage~II to improve comfort and real-time interaction quality; and recent studies by Ma et al., Zhou et al., and Kim et al. \cite{ma_mgl4qgr_2024, zhou_bvip_2024, kim_transforming_2023} demonstrate the potential of Stage~III in capturing complex interaction patterns and adapting to diverse guidance scenarios. Despite their differences in modeling assumptions and technical realizations, these stages expose two common bottlenecks in high-safety, long-duration guidance tasks: the difficulty of simultaneously addressing long-term objectives and real-time interaction demands, and the limited ability to represent and exploit multimodal human behaviors.
+
+First, limited objective coverage across stages. Stage I emphasizes long-term path optimality, Stage II prioritizes real-time interaction and force compliance, and Stage III focuses on learning interaction patterns from data. However, none of these stages provides a holistic design that jointly accounts for long-term efficiency and short-term interaction quality. As a result, long-term planned trajectories may be globally optimal but uncomfortable in practice, real-time compliant control enables natural interaction yet lacks foresight, and data-driven approaches can capture complex interaction patterns but often fail to deliver consistently stable performance across efficiency, comfort, and safety. These shortcomings arise from the inherent tension between coarse-grained long-term planning and fine-grained real-time control, as well as the absence of unified objectives or shared state representations that can coherently integrate information across time scales.
+
+Second, insufficient modeling of behavioral multimodality. Human behavior in guidance interactions is inherently multi-strategic and highly individualized; for the same goal, a user may choose to go left, go right, or temporarily slow down. In contrast, most existing methods produce deterministic single-solution outputs: Stage I optimizes a single trajectory, Stage II applies fixed control laws, and Stage III typically learns mean or unimodal policies. This design choice often leads to local optima or unstable switching behaviors. In practice, it manifests as limited obstacle-avoidance options, weak adaptation to individual preferences, and a lack of alternative responses under sudden environmental changes. These issues stem from traditional optimization’s preference for single solutions, insufficient representation of uncertainty in human decision-making, and the lack of mechanisms for real-time multi-candidate generation, evaluation, and safety filtering.
+
+\section{KEY CHALLENGES IN pHRI GUIDANCE RESEARCH}
+
+\subsection{Hybrid Architecture of Learning and Optimization for Guide Robots}
+
+As discussed above, existing pHRI guidance methods often face difficulty in simultaneously achieving long-term task efficiency and high-quality real-time interaction. Learning-based approaches can capture complex nonlinear and time-varying human behaviors from data and enable a degree of online adaptation, yet they typically lack interpretability and formal safety guarantees. In contrast, model-based methods exploit well-understood physical mechanisms and stability analysis, facilitating explicit constraint enforcement and safe operation, but they are limited in representing human behavior diversity, parameter time-variance, and environmental uncertainty. Consequently, integrating the strengths of both paradigms has increasingly become a shared goal in the field, though a consensus on the optimal fusion strategy remains absent.
+
+Based on the division of labor between learning and optimization/control, existing studies can be categorized into several representative fusion paradigms, as illustrated in Fig.~3. Generally, these methods incorporate learning modules at various levels to compensate for incomplete or uncertain system models—such as online identification of latent variables including human intention, parameters, or preferences—while the optimization/control modules handle constraint enforcement, interpretable execution, and closed-loop safety assurance.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.48\textwidth]{assets/3.pdf}
+    \caption{Comparison of Learning and Optimization Fusion Architectures}
+    \label{fig:fusion-architectures}
+\end{figure}
+
+In designing fusion architectures for pHRI guidance, the choice between learning-based and traditional optimization or control methods for different modules is primarily determined by module objectives and environmental characteristics. The learning-based identification with optimization-based control paradigm is well suited to scenarios that require accurate modeling of human–robot coupled dynamics, where learning modules are employed for parameter identification or dynamic modeling of interaction forces, human responses, or flexible leash nonlinearities, while lower-layer MPC or QP controllers perform closed-loop execution, jointly balancing trajectory accuracy, safety constraints, and adaptation to individual differences in complex nonlinear environments, as exemplified by the TCN–MPC framework proposed by Zhou et al.~\cite{zhou_bvip_2024} and the RMA-based approach of Xiao et al.~\cite{ma_mgl4qgr_2024}. The optimization-based control with learning-based adaptation paradigm is more appropriate for structured or semi-structured environments with stringent real-time interaction compliance requirements, in which lower-layer optimization control guarantees physical safety and compliance, while learning modules capture user preferences or short-term behavioral patterns to enhance local adaptability, as demonstrated by the hierarchical control framework of Gu et al.~\cite{gu_hierarchical_2025} and the preference-based reinforcement learning methods introduced by Liu et al.~\cite{liu_task_2022}. The learning-based planning with optimization-based control paradigm is particularly suitable for large-scale environments where explicit global planning models are difficult to construct, with learning modules generating global or local planning strategies and lower-layer optimization control ensuring accurate and safe execution, as in the MDP-based wayfinding approach of Kim et al.~\cite{kim_transforming_2023}. In addition, hybrid architectures that integrate search-based planning with learning-based components or adopt hierarchical designs are effective in scenarios that simultaneously demand high safety and broad spatial coverage, where search methods provide globally feasible solutions and learning modules perform local refinement or human intention inference.
+
+
+In general, learning-based methods excel at modeling complex nonlinearities, multimodal behaviors, and individual differences, whereas traditional optimization and control provide global feasibility, stable closed-loop execution, and enforce safety constraints. Hierarchical or modular combinations of these paradigms can balance global stability with local flexibility in long-duration interactions, with specific choices reflecting trade-offs among environmental complexity, task time scales, user variability, and real-time requirements. Nevertheless, unified design guidelines remain absent. Future framework design should explicitly consider clear division of module responsibilities, unified representation of long- and short-term objectives, safe integration of multimodal behaviors, and simultaneous assurance of stability, interpretability, and safety in real human-robot closed-loops—challenges that are critical for advancing pHRI guidance systems toward deployable applications.
+
+\subsection{Multimodal Planning and Global Optimality}
+
+As discussed above, human behavior in guidance interactions naturally exhibits multimodal characteristics. When pursuing the same objective, a person may go left, go right, or briefly pause; under the combined influence of dynamic obstacles, crowding variations, and individual preferences \cite{liu_task_2022, zhou_bvip_2024}, behavior cannot be accurately represented by a single deterministic solution. Traditional optimization planning, however, typically produces deterministic trajectories, which are prone to local optima, oscillations, or inconsistent behavior across multiple solutions. Overcoming local optima and enabling multimodal planning is therefore essential for practical deployment of pHRI systems. Various technical approaches have proposed preliminary solutions for multimodal decision-making \cite{aliotta_understanding_2025, kim_transforming_2023}.  
+
+Fig.~4 summarizes four representative technical routes along with their multimodal mechanisms, advantages, and limitations. Generative models and imitation learning emphasize capturing diverse behavior patterns, Teacher-Student reinforcement learning \cite{ma_mgl4qgr_2024} focuses on learning multiple policies and enabling efficient deployment, and data-driven global search aims to escape local optima by leveraging learned heuristics \cite{kim_transforming_2023}.
+
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.48\textwidth]{assets/4.pdf}
+    \caption{Comparison of Mainstream Technical Solutions for Multimodal Planning}
+    \label{fig:multimodal-planning}
+\end{figure}
+
+From an applicability perspective, generative models and imitation learning are most suitable for scenarios with relatively abundant data and well-defined behavior patterns. Teacher-Student reinforcement learning \cite{ma_mgl4qgr_2024, aliotta_understanding_2025} is better suited for complex environments that require multi-policy switching and extensive simulation training. Data-driven global search \cite{kim_transforming_2023} is appropriate for planning problems with constructible high-fidelity simulations and significant combinatorial complexity.
+
+While these approaches address the need for multimodal planning from different angles, their systematic application in pHRI, particularly in guidance scenarios, remains at an early stage. Key challenges for future research include developing reliable multimodal representations and uncertainty modeling with limited interaction data, enabling real-time generation, evaluation, and consistent selection of multiple candidate behaviors \cite{hwang_is_2024}, and incorporating verifiable safety boundaries and closed-loop stability guarantees to mitigate risks arising from policy diversity.
+
+
+\section{CONCLUSION}
+
+
+Using guide robots as an observation window, this paper systematically reviewed the evolution of pHRI technology in guidance scenarios. Through comprehensive analysis of representative works, we identified three developmental stages and distilled two key research challenges that will shape future advances in the field.
+
+The three developmental stages of pHRI guidance technology are:
+\begin{enumerate}
+\item \textbf{Stage I: System modeling and optimization solving}, establishing explicit human–robot dynamics and generating globally optimal guidance paths.
+\item \textbf{Stage II: Real-time interaction control}, ensuring responsive and compliant interaction through online force perception and control.
+\item \textbf{Stage III: Data-driven interaction policy learning}, capturing complex, multimodal behaviors for adaptive interaction in unstructured environments.
+\end{enumerate}
+
+Two critical research challenges remain:
+\begin{enumerate}
+\item \textbf{Hybrid architecture of learning and optimization}, coordinating learning and optimization across time scales while ensuring stability, interpretability, and safety.
+\item \textbf{Multimodal planning and global optimality}, representing and selecting multiple feasible solutions to escape local optima under real-time constraints while guaranteeing safety.
+\end{enumerate}
+
+Guide robots, which demand high safety, long-duration interaction, and user comfort, provide a representative scenario for developing fusion architectures and multimodal planning methods. Advances in these areas are expected to yield reusable methodologies and system-level design insights applicable to a wide range of physical human–robot interaction domains, including rehabilitation assistance, collaborative transportation, and service guidance.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\addtolength{\textheight}{-12cm}   % This command serves to balance the column lengths
+                                  % on the last page of the document manually. It shortens
+                                  % the textheight of the last page by a suitable amount.
+                                  % This command does not take effect until the next page
+                                  % so it should come on the page before the last. Make
+                                  % sure that you do not shorten the textheight too much.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\section*{ACKNOWLEDGMENT}
+%The authors would like to thank...
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibliographystyle{IEEEtran}
+\bibliography{assets/guide}
+
+
+
+
+\end{document}
